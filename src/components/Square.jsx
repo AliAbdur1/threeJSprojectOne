@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import gsap from 'gsap';
 
 function Square() {
   const canvasRef = useRef(null);
@@ -74,7 +75,45 @@ function Square() {
 
     const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current });
     renderer.setSize(sizes.width, sizes.height);
-    renderer.render(scene, camera);
+    
+    // let time = Date.now();
+    const clock = new THREE.Clock();
+
+    gsap.to(cube.position, { x: 4, duration: 1, delay: 1})
+    gsap.to(cube.position, { x: 0, duration: 1, delay: 3})
+    // green sock or gsap has its own tick
+    const tick = () => {
+      const elapsedTime = clock.getElapsedTime();
+
+      // const currenttime = Date.now();
+      // const deltaTime = currenttime - time;
+      // time = currenttime;
+      
+      // update objects
+
+      // group.rotation.y = elapsedTime * Math.PI * 2; // deltaTime; // make objects rotate at same speed regardless of frame rate
+      // group.position.x = elapsedTime * Math.sin(elapsedTime) / 3
+      // group.position.y = elapsedTime * Math.cos(elapsedTime) / 3
+      camera.position.y = Math.sin(elapsedTime);
+      camera.position.x = Math.cos(elapsedTime);
+      camera.lookAt(group.position);
+      // let cubeRotation = cube.rotation.x;
+      cube.rotation.x += 0.01;
+      cube.rotation.y += 0.01;
+      cube.rotation.z += 0.01;
+      
+
+      // while (cubeRotation < 1) {
+      //   cubeRotation += 0.02;
+      // }
+      
+      
+      renderer.render(scene, camera);
+      window.requestAnimationFrame(tick); // calls the function again
+    }
+
+    tick();
+
   }, []);
 
   return (
