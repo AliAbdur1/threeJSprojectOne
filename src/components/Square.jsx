@@ -9,13 +9,6 @@ const sizes = {
   height: window.innerHeight
 };
 
-window.addEventListener('resize', () => {
-  sizes.width = window.innerWidth;
-  sizes.height = window.innerHeight;
-  camera.aspect = sizes.width / sizes.height;
-  camera.updateProjectionMatrix();
-  renderer.setSize(sizes.width, sizes.height);
-});
 
 const cursor = {
   x: 0,
@@ -29,8 +22,27 @@ window.addEventListener('mousemove', (event) => {
 });
 function Square() {
   const canvasRef = useRef(null);
-
+  
   useEffect(() => {
+// had to move this eventlistener to useEffect so that it would run when the component is mounted
+    window.addEventListener('resize', () => {
+      sizes.width = window.innerWidth;
+      sizes.height = window.innerHeight;
+      camera.aspect = sizes.width / sizes.height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(sizes.width, sizes.height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      console.log('window is resized');
+    });
+// fullscreen code block
+    window.addEventListener('dblclick', () => {
+      if(!document.fullscreenElement)
+        canvasRef.current.requestFullscreen();
+      else
+        document.exitFullscreen();
+      console.log('double clicked');
+    });
+
     const scene = new THREE.Scene();
 
     const geometry = new THREE.BoxGeometry(3, 3.5, 2);
@@ -74,7 +86,7 @@ function Square() {
 
     // be aware of the order of rotation
     // gimbal lock fix: change the order of rotation
-    cube.rotation.reorder = "YXZ"; // reorder before changing rotation
+    cube.rotation.order = "YXZ"; // reorder before changing rotation
     cube.rotation.y = Math.PI / 2;
     cube.rotation.x = Math.PI / 3;
     cube.rotation.z = Math.PI / 1.5;
@@ -104,6 +116,8 @@ function Square() {
 
     const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current });
     renderer.setSize(sizes.width, sizes.height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // for device pixel ratio
+
     
     // let time = Date.now();
     const clock = new THREE.Clock();

@@ -7,7 +7,7 @@ function App() {
   return (
     <>
     <div>
-      <h1>threeJS project</h1>
+      
       <Square />
     </div>
       
