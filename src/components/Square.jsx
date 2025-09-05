@@ -34,14 +34,26 @@ function Square() {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       console.log('window is resized');
     });
-// fullscreen code block
+// fullscreen code block. all the webkit shit is for safari and stuff
     window.addEventListener('dblclick', () => {
-      if(!document.fullscreenElement)
-        canvasRef.current.requestFullscreen();
-      else
-        document.exitFullscreen();
-      console.log('double clicked');
-    });
+  const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement;
+
+  if (!fullscreenElement) {
+    if (canvasRef.current.requestFullscreen) {
+      canvasRef.current.requestFullscreen();
+    } else if (canvasRef.current.webkitRequestFullscreen) {
+      canvasRef.current.webkitRequestFullscreen();
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  }
+
+  console.log('double clicked');
+});
 
     const scene = new THREE.Scene();
 
@@ -55,9 +67,24 @@ function Square() {
     group.rotation.y = Math.PI / 4;
     scene.add(group);
 
+    const positionsArray = new Float32Array([
+      0, 0, 0,
+      0, 1, 0,
+      1, 0, 0
+    ])
+
+    const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3);
+    const geometry1 = new THREE.BufferGeometry();
+    const geomaterial = new THREE.MeshBasicMaterial({ color: 0x98F5F9 });
+    geometry1.setAttribute('position', geomaterial, positionsAttribute);
+
+    //for (let i = 0; i < 9; i++) {
+      //positionsArray[i] = (Math.random() - 0.5) * 4;
+    //}
+
     const cube1 = new THREE.Mesh(
-      new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshBasicMaterial({ color: 0x98F5F9 }) // applys material to the cube
+      new THREE.BoxGeometry(2, 2, 2),
+      new THREE.MeshBasicMaterial({ color: 0x98F5F9 , wireframe: true}) // applys material to the cube
     )
     cube1.position.x = 0;
 
