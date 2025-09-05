@@ -67,16 +67,27 @@ function Square() {
     group.rotation.y = Math.PI / 4;
     scene.add(group);
 
-    const positionsArray = new Float32Array([
-      0, 0, 0,
-      0, 1, 0,
-      1, 0, 0
-    ])
+    // Define vertices of a single triangle
+const positionsArray = new Float32Array([
+  0, 0, 0,   // Vertex 1
+  0, 1, 0,   // Vertex 2
+  1, 0, 0    // Vertex 3
+]);
 
-    const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3);
-    const geometry1 = new THREE.BufferGeometry();
-    const geomaterial = new THREE.MeshBasicMaterial({ color: 0x98F5F9 });
-    geometry1.setAttribute('position', geomaterial, positionsAttribute);
+// Create a BufferAttribute and attach it to the geometry
+const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3);
+const geometry1 = new THREE.BufferGeometry();
+geometry1.setAttribute('position', positionsAttribute);
+
+// Create material
+const geomaterial = new THREE.MeshBasicMaterial({ color: 0x98F5F9, side: THREE.DoubleSide });
+
+// Create the mesh
+const triangleMesh = new THREE.Mesh(geometry1, geomaterial);
+
+// Add to scene
+scene.add(triangleMesh);
+
 
     //for (let i = 0; i < 9; i++) {
       //positionsArray[i] = (Math.random() - 0.5) * 4;
