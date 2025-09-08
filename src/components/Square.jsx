@@ -2,7 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import GUI from 'lil-gui';
 
+const gui = new GUI();
 
 const sizes = {
   width: window.innerWidth,
@@ -68,25 +70,40 @@ function Square() {
     scene.add(group);
 
     // Define vertices of a single triangle
-const positionsArray = new Float32Array([
-  0, 0, 0,   // Vertex 1
-  0, 1, 0,   // Vertex 2
-  1, 0, 0    // Vertex 3
-]);
 
 // Create a BufferAttribute and attach it to the geometry
-const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3);
+
+// Create geometry
 const geometry1 = new THREE.BufferGeometry();
+const tricount = 30;
+
+// Each triangle has 3 vertices, each vertex has 3 coordinates (x,y,z)
+const positionsArray = new Float32Array(tricount * 3 * 3);
+
+for (let i = 0; i < positionsArray.length; i++) {
+  positionsArray[i] = (Math.random() - 0.5) * 4; // Random spread
+}
+
+// Attach positions to geometry
+const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3);
 geometry1.setAttribute('position', positionsAttribute);
 
-// Create material
-const geomaterial = new THREE.MeshBasicMaterial({ color: 0x98F5F9, side: THREE.DoubleSide });
+// Create a material (DoubleSide so both faces show)
+const trimaterial = new THREE.MeshBasicMaterial({
+  color: 0xFFEB3B,
+  side: THREE.DoubleSide,
+  wireframe: true // set true if you want outlines only
+});
 
-// Create the mesh
-const triangleMesh = new THREE.Mesh(geometry1, geomaterial);
+// Make a mesh out of it
+const triangleMesh = new THREE.Mesh(geometry1, trimaterial);
 
 // Add to scene
 scene.add(triangleMesh);
+
+
+
+
 
 
     //for (let i = 0; i < 9; i++) {
@@ -117,21 +134,30 @@ scene.add(triangleMesh);
 
     group.add(cube1, cube2, cube3); // adds the cube to the group
     // position properties of the cube. must be before reder call
-  
+    
     scene.add(cube);
     cube.position.set(-2, -3, -4); // same as above, lets u set all at once
     cube.scale.set(2, 0.5, .5);
-
+    
     // be aware of the order of rotation
     // gimbal lock fix: change the order of rotation
     cube.rotation.order = "YXZ"; // reorder before changing rotation
     cube.rotation.y = Math.PI / 2;
     cube.rotation.x = Math.PI / 3;
     cube.rotation.z = Math.PI / 1.5;
-
+    
     //axis helper
     const axesHelper = new THREE.AxesHelper(2); // number perameter is the length of the handles
     scene.add(axesHelper); // axishelper is an object and must be added to the scene
+    gui
+      .add(cube.position, 'y')
+      .min(-5).max(5)
+      .step(0.01)
+      .name('elevation');
+    gui
+      .add(cube, 'visible');
+    gui
+      .add(cube.material, 'wireframe');
 
     
     
