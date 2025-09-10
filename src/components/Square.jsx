@@ -4,7 +4,6 @@ import gsap from 'gsap';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import GUI from 'lil-gui';
 
-const gui = new GUI();
 
 const sizes = {
   width: window.innerWidth,
@@ -26,6 +25,19 @@ function Square() {
   const canvasRef = useRef(null);
   
   useEffect(() => {
+    const gui = new GUI({
+      title: 'Debug UI Settings',
+      width: 300,
+      closeFolders: true
+    });
+    gui.close();
+    window.addEventListener('keydown', (event) =>
+      {
+        if (event.key === 'h') {
+          gui.show(gui._hidden); // toggles debug ui
+        }
+      });
+    const guidebug = {}
 // had to move this eventlistener to useEffect so that it would run when the component is mounted
     window.addEventListener('resize', () => {
       sizes.width = window.innerWidth;
@@ -60,7 +72,8 @@ function Square() {
     const scene = new THREE.Scene();
 
     const geometry = new THREE.BoxGeometry(3, 3.5, 2);
-    const material = new THREE.MeshBasicMaterial({ color: 0x20DE56 });
+    guidebug.color = 0xb79f3f;
+    const material = new THREE.MeshBasicMaterial({ color: guidebug.color });
     const cube = new THREE.Mesh(geometry, material);
 
     const group = new THREE.Group();
@@ -149,30 +162,60 @@ scene.add(triangleMesh);
     //axis helper
     const axesHelper = new THREE.AxesHelper(2); // number perameter is the length of the handles
     scene.add(axesHelper); // axishelper is an object and must be added to the scene
-    gui
-      .add(cube.position, 'y')
-      .min(-5).max(5)
-      .step(0.01)
-      .name('elevation');
-    gui
-      .add(cube, 'visible');
-    gui
-      .add(cube.material, 'wireframe');
-
     
     
     const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 1, 1000); // field of veiw recommendation 45 - 75. 1 and 1000 are near and far perameters
     const aspectRatio = sizes.width / sizes.height;
     // const camera = new THREE.OrthographicCamera(
-    //   -1 * aspectRatio,
-    //    1 * aspectRatio,
-    //     1, 
-    //     -1, 
-    //     0.1, 
-    //     100);
-    camera.position.set (-1, 1, 6); // same as above, lets u set all camera positions at once
-    console.log(cube.position.distanceTo(camera.position),"camera position");
-    scene.add(camera);
+      //   -1 * aspectRatio,
+      //    1 * aspectRatio,
+      //     1, 
+      //     -1, 
+      //     0.1, 
+      //     100);
+      camera.position.set (-1, 1, 6); // same as above, lets u set all camera positions at once
+      console.log(cube.position.distanceTo(camera.position),"camera position");
+      scene.add(camera);
+      
+      const floatyCubeTweaks = gui.addFolder('Floaty Cube Tweaks')
+      floatyCubeTweaks
+        .add(cube.position, 'y')
+        .min(-5).max(5)
+        .step(0.01)
+        .name('elevation');
+      floatyCubeTweaks
+        .add(cube, 'visible');
+      floatyCubeTweaks
+        .add(cube.material, 'wireframe');
+      floatyCubeTweaks
+        .addColor(guidebug, 'color')
+        .onChange((value) => 
+        {
+          material.color.set(value)
+          console.log(material.color.getHexString())
+          // threeJS uses some sort of color optimizer thing to get the hex value. color look a bit different than expected
+        });
+
+    guidebug.spin = () => {
+      gsap.to(cube.rotation, {y: cube.rotation.y + Math.PI * 2})
+    }
+    floatyCubeTweaks.add(guidebug, 'spin')
+
+    guidebug.subdivision = 2
+    floatyCubeTweaks
+        .add(guidebug, 'subdivision')
+        .min(1)
+        .max(20)
+        .step(1)
+        .onFinishChange(() =>
+          {
+            cube.geometry.dispose();
+            cube.geometry = new THREE.BoxGeometry(
+              3, 3, 3,
+              guidebug.subdivision, guidebug.subdivision, guidebug.subdivision);
+              // changes subdivision amount of object
+            console.log('subdivision changed')
+          })
 
     const controls = new OrbitControls(camera, canvasRef.current)
     controls.enableDamping = true;
@@ -233,6 +276,7 @@ scene.add(triangleMesh);
     <div>
       <canvas ref={canvasRef} className="squareOnScreen" id="square_canvas"></canvas>
     </div>
+    
   );
 }
 
