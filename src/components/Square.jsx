@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import GUI from 'lil-gui';
+import ImageSourceBrick1 from '/src/images/brick texture-1.jpg'
 
 
 const sizes = {
@@ -38,6 +39,20 @@ function Square() {
         }
       });
     const guidebug = {}
+    const imagebrick1 = new Image();
+    imagebrick1.src = ImageSourceBrick1; // image import
+    const texturebrick1 = new THREE.Texture(imagebrick1);
+    texturebrick1.colorSpace = THREE.SRGBColorSpace; // sRBG encoding
+    imagebrick1.onload = () => {
+      
+      texturebrick1.needsUpdate = true;
+      // guidebug.texture = texture
+    }
+
+    const textureloader = new THREE.TextureLoader();
+    const texturebrick2 = textureloader.load('src/images/19895-wall-texture-bricks-light-4k.jpg');
+    texturebrick2.colorSpace = THREE.SRGBColorSpace;
+
 // had to move this eventlistener to useEffect so that it would run when the component is mounted
     window.addEventListener('resize', () => {
       sizes.width = window.innerWidth;
@@ -133,7 +148,7 @@ scene.add(triangleMesh);
 
     const cube2 = new THREE.Mesh(
       new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshBasicMaterial({ color: 0xFFECA1 }) // applys material to the cube
+      new THREE.MeshBasicMaterial({ map: texturebrick1 }) // applys material to the cube
     )
     cube2.position.x = -1.5;
 
@@ -141,7 +156,7 @@ scene.add(triangleMesh);
 
     const cube3 = new THREE.Mesh(
       new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshBasicMaterial({ color: 0xEFC3CA }) // applys material to the cube
+      new THREE.MeshBasicMaterial({ map: texturebrick2 }) // applys material to the cube
     )
     cube3.position.x = 1.5;
 
