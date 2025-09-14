@@ -49,8 +49,41 @@ function Square() {
       // guidebug.texture = texture
     }
 
-    const textureloader = new THREE.TextureLoader();
+    const loadingManager = new THREE.LoadingManager();
+
+    loadingManager.onStart = () => {
+      console.log('Loading started');
+    }
+    loadingManager.onProgress = () => {
+      console.log('Loading in progress');
+    }
+
+    loadingManager.onLoad = () => {
+      console.log('Loading finished');
+    }
+
+    const textureloader = new THREE.TextureLoader(loadingManager);
     const texturebrick2 = textureloader.load('src/images/19895-wall-texture-bricks-light-4k.jpg');
+    const colortexture = textureloader.load('src/images/10-textures/static/textures/door/color.jpg');
+    const colortexture2 = textureloader.load('src/images/10-textures/static/textures/minecraft.png');
+    const alphatexture = textureloader.load('src/images/10-textures/static/textures/door/alpha.jpg');
+    const heighttexture = textureloader.load('src/images/10-textures/static/textures/door/height.jpg');
+    const normaltexture = textureloader.load('src/images/10-textures/static/textures/door/normal.jpg');
+    const ambientocclusiontexture = textureloader.load('src/images/10-textures/static/textures/door/ambientOcclusion.jpg');
+    const metalness = textureloader.load('src/images/10-textures/static/textures/door/metalness.jpg');
+    const roughness = textureloader.load('src/images/10-textures/static/textures/door/roughness.jpg');
+    // colortexture.repeat.x = 2;
+    // colortexture.repeat.y = 3;
+    // colortexture.wrapS = THREE.MirroredRepeatWrapping;
+    // colortexture.wrapT = THREE.RepeatWrapping;
+    // colortexture.offset.x = 0.5;
+    colortexture.rotation = Math.PI / 4;
+    colortexture.center.x = 0.5;
+    colortexture.center.y = 0.5;
+    colortexture.minFilter = THREE.NearestFilter;
+    colortexture2.magFilter = THREE.NearestFilter; // better for performance
+    colortexture.colorSpace = THREE.SRGBColorSpace;
+    colortexture2.colorSpace = THREE.SRGBColorSpace;
     texturebrick2.colorSpace = THREE.SRGBColorSpace;
 
 // had to move this eventlistener to useEffect so that it would run when the component is mounted
@@ -160,7 +193,23 @@ scene.add(triangleMesh);
     )
     cube3.position.x = 1.5;
 
-    group.add(cube1, cube2, cube3); // adds the cube to the group
+    const cube4 = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      new THREE.MeshBasicMaterial({ map: colortexture }) // applys material to the cube
+    )
+    cube4.position.x = 2.5;
+    cube4.position.y = 1;
+    cube4.position.z = 1;
+
+    const cube5 = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      new THREE.MeshBasicMaterial({ map: colortexture2 }) // applys material to the cube
+    )
+    cube5.position.x = 0.5;
+    cube5.position.y = 1;
+    cube5.position.z = 2;
+
+    group.add(cube1, cube2, cube3, cube4, cube5); // adds the cube to the group
     // position properties of the cube. must be before reder call
     
     scene.add(cube);
